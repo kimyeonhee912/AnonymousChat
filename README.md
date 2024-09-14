@@ -1,70 +1,48 @@
-# Getting Started with Create React App
+# AnonymousChat
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+AnonymousChat은 사용자가 익명으로 메시지를 보내고 받을 수 있는 웹 애플리케이션입니다. React, JavaScript 및 Supabase를 사용하여 구축된 이 앱은 사용자가 자신의 정체를 드러내지 않고도 소통할 수 있는 간단하고 직관적인 인터페이스를 제공합니다.
 
-## Available Scripts
+## 업데이트 상황 (2024.09.15 업데이트)
 
-In the project directory, you can run:
+- 기본적인 UI 구현 완료했습니다.
 
-### `npm start`
+## 기능
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **익명 메시지 전송**: 사용자는 가입이나 로그인 없이 메시지를 보낼 수 있습니다.
+- **실시간 업데이트**: 메시지가 전송되면 실시간으로 화면에 표시됩니다. 
+- **타임스탬프가 있는 메시지**: 각 메시지는 전송된 시간을 나타내는 타임스탬프와 함께 표시됩니다.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+## 사용 기술
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **React**: 사용자 인터페이스 구축을 위한 라이브러리.
+- **JavaScript**: 애플리케이션 로직 처리를 위한 언어.
+- **Supabase**: 데이터베이스 관리 등 백엔드 서비스 제공.
 
-### `npm run build`
+## 설치
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+로컬에서 프로젝트를 실행하려면 다음 단계를 따르세요:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. 레포지토리 클론:
+   ```bash
+   git clone https://github.com/yourusername/AnonymousChat.git
+   ```
+2. 프로젝트 디렉토리로 이동:
+   ```bash
+   cd AnonymousChat
+   ```
+4. 필요한 의존성 설치:
+   ```bash
+    npm install
+   ```
+6. 개발 서버 시작:
+   ```bash
+    npm run start
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 사용 방법
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- 브라우저를 열고 http://localhost:3000으로 이동합니다.
+- 입력 필드에 메시지를 입력합니다.
+- "Enter"를 누르거나 "전송" 버튼을 클릭하여 메시지를 보냅니다.
+- 아래에서 타임스탬프와 함께 메시지를 확인합니다.
