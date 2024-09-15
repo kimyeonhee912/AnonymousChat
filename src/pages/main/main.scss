@@ -22,6 +22,34 @@
   &::-webkit-scrollbar {
     width: 0;
   }
+
+  .date-divider {
+    width: 100%; // 전체 너비를 사용
+    text-align: center;
+    color: #4f4f4f;
+    font-size: 0.9em;
+    margin: 10px 0;
+    position: relative;
+    align-self: stretch; // 부모 컨테이너의 전체 너비를 차지하도록 설정
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background-color: #868686;
+    }
+
+    &::before {
+      left: 0;
+    }
+
+    &::after {
+      right: 0;
+    }
+  }
 }
 
 .message-item {
