@@ -3,55 +3,100 @@
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  height: 100vh;
+  background-color: #f1f1f1;
+}
+
+.message-list {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-height: 95vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-right: 15px;
+
+  /* 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+.message-item {
+  background-color: #ffffff;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  min-width: 150px;
+  word-wrap: break-word;
+  position: relative;
+  align-self: flex-end;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 21px;
+    right: -20px;
+    border-left: 30px solid #ffffff;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+
+  p {
+    margin: 0;
+    word-wrap: break-word;
+  }
+
+  span {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    align-self: flex-end;
+  }
 }
 
 .message-input {
   display: flex;
-  margin-bottom: 20px;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 20px;
 
-  input {
+  textarea {
     padding: 10px;
     font-size: 16px;
     margin-right: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    flex: 1;
+    min-height: 40px;
+
+    // 포커스 시 보더 색상 변경
+    &:focus {
+      border-color: #2e7eff; // 원하는 색상으로 변경
+      outline: none; // 기본 포커스 아웃라인 제거
+    }
   }
 
   button {
     padding: 10px 15px;
     font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
+    background-color: #ffffff;
+    color: #2e7eff;
+    border: 1px solid #2e7eff;
     border-radius: 5px;
     cursor: pointer;
+    // 고정된 너비 설정
+    width: 80px;
+    max-height: 40px;
   }
 
   button:hover {
-    background-color: #0056b3;
-  }
-}
-
-.message-list {
-  width: 100%;
-  max-width: 600px;
-
-  .message-item {
-    background-color: #f1f1f1;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    display: flex;
-
-    p {
-      margin: 0;
-    }
-
-    span {
-      font-size: 12px;
-      color: #666;
-      margin-top: 5px;
-      display: block;
-    }
+    background-color: #2e7eff;
+    color: #ffffff;
   }
 }
