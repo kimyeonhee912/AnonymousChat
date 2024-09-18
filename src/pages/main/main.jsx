@@ -5,7 +5,7 @@ import supabase from "./supabaseClient.js";
 export const Main = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const messageListRef = useRef(null); // 메시지 목록 참조
+  const messageListRef = useRef(null);
   const textareaRef = useRef(null);
 
   const sortMessagesByTime = (msgs) => {
@@ -21,7 +21,7 @@ export const Main = () => {
       if (error) {
         console.error("Error fetching messages:", error);
       } else {
-        setMessages(sortMessagesByTime(message)); // 정렬된 메시지를 설정
+        setMessages(sortMessagesByTime(message));
       }
     };
 
@@ -32,16 +32,14 @@ export const Main = () => {
     if (message.trim() !== "") {
       const now = new Date();
 
-      // 한국 시간으로 변환
-      const kstOffset = 9 * 60 * 60 * 1000; // KST는 UTC+9
+      const kstOffset = 9 * 60 * 60 * 1000;
       const kstTime = new Date(now.getTime() + kstOffset);
 
-      // YYYY-MM-DDTHH:MM:SS.sss 형태로 변환
-      const formattedTime = kstTime.toISOString().replace("Z", ""); // Z 제거
+      const formattedTime = kstTime.toISOString().replace("Z", "");
 
       const newMessage = {
         text: message,
-        time: formattedTime, // 변경된 포맷 시간 사용
+        time: formattedTime,
       };
 
       await supabase.from("message").insert([newMessage]);
@@ -49,24 +47,21 @@ export const Main = () => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setMessage("");
 
-      // 전송 후 약간 지연 후 메시지 목록이 보이도록 스크롤
       setTimeout(() => {
         if (messageListRef.current) {
           messageListRef.current.scrollTop =
             messageListRef.current.scrollHeight;
         }
-      }, 0); // 0ms 지연
+      }, 0);
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       if (e.shiftKey) {
-        // Shift + Enter: 줄 바꿈
         setMessage((prev) => prev + "\n");
-        e.preventDefault(); // 기본 동작 방지
+        e.preventDefault();
       } else {
-        // Enter: 메시지 전송
         e.preventDefault();
         handleSendMessage();
       }
@@ -78,7 +73,7 @@ export const Main = () => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
       console.error("Invalid date:", dateString);
-      return ""; // 유효하지 않은 날짜인 경우 빈 문자열 반환
+      return "";
     }
 
     return new Intl.DateTimeFormat("ko-KR", {
@@ -88,25 +83,31 @@ export const Main = () => {
     }).format(date);
   };
 
+  // 시간 포맷 함수
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
       console.error("Invalid time:", dateString);
-      return ""; // 유효하지 않은 시간인 경우 빈 문자열 반환
+      return "";
     }
 
     const kstDate = new Date(
       date.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-    ); // KST로 변환
+    );
 
     return new Intl.DateTimeFormat("ko-KR", {
       hour: "numeric",
       minute: "2-digit",
-      hour12: true, // 12시간 형식 사용
+      hour12: true,
     })
       .format(kstDate)
       .replace("오후", "오후 ")
-      .replace("오전", "오전 "); // "오후"와 "오전" 사이에 공백 추가
+      .replace("오전", "오전 ");
+  };
+
+  // 줄 수 계산
+  const calculateRows = () => {
+    return (message.match(/\n/g) || []).length + 1;
   };
 
   return (
@@ -148,7 +149,7 @@ export const Main = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          rows={1}
+          rows={calculateRows()}
           style={{ resize: "none", overflow: "hidden" }}
         />
         <button onClick={handleSendMessage}>전송</button>
