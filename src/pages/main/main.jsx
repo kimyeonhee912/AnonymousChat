@@ -21,7 +21,14 @@ export const Main = () => {
       if (error) {
         console.error("Error fetching messages:", error);
       } else {
-        setMessages(sortMessagesByTime(message));
+        const sortedMessages = sortMessagesByTime(message);
+        setMessages(sortedMessages);
+
+        // 페이지가 새로고침된 후 스크롤을 마지막 메시지로 설정
+        if (messageListRef.current) {
+          messageListRef.current.scrollTop =
+            messageListRef.current.scrollHeight;
+        }
       }
     };
 
