@@ -61,8 +61,15 @@ export const Main = () => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendMessage();
+      if (e.shiftKey) {
+        // Shift + Enter: 줄 바꿈
+        setMessage((prev) => prev + "\n");
+        e.preventDefault(); // 기본 동작 방지
+      } else {
+        // Enter: 메시지 전송
+        e.preventDefault();
+        handleSendMessage();
+      }
     }
   };
 
@@ -116,10 +123,16 @@ export const Main = () => {
               {currentDate !== prevDate && (
                 <div className="date-divider">{currentDate}</div>
               )}
-
               <div className="message-item">
                 <div className="message">
-                  <p>{msg.text}</p>
+                  <p>
+                    {msg.text.split("\n").map((line, index) => (
+                      <React.Fragment key={index}>
+                        {line}
+                        {index < msg.text.split("\n").length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
+                  </p>
                 </div>
                 <span>{formatTime(msg.time)}</span>
               </div>
