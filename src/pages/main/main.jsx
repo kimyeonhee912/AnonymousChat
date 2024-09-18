@@ -5,7 +5,6 @@ import supabase from "./supabaseClient.js";
 export const Main = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  console.log("🚀 ~ Main ~ messages:", messages);
   const messageListRef = useRef(null); // 메시지 목록 참조
   const textareaRef = useRef(null);
 
@@ -32,11 +31,17 @@ export const Main = () => {
   const handleSendMessage = async () => {
     if (message.trim() !== "") {
       const now = new Date();
-      const kstTime = new Date(now.getTime() + 9 * 60 * 60 * 1000); // 한국 시간으로 변환
+
+      // 한국 시간으로 변환
+      const kstOffset = 9 * 60 * 60 * 1000; // KST는 UTC+9
+      const kstTime = new Date(now.getTime() + kstOffset);
+
+      // YYYY-MM-DDTHH:MM:SS.sss 형태로 변환
+      const formattedTime = kstTime.toISOString().replace("Z", ""); // Z 제거
 
       const newMessage = {
         text: message,
-        time: kstTime.toISOString(), // 한국 시간을 ISO 문자열로 변환
+        time: formattedTime, // 변경된 포맷 시간 사용
       };
 
       await supabase.from("message").insert([newMessage]);
@@ -69,21 +74,32 @@ export const Main = () => {
       return ""; // 유효하지 않은 날짜인 경우 빈 문자열 반환
     }
 
-    return date.toLocaleDateString("ko-KR", {
+    return new Intl.DateTimeFormat("ko-KR", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-    });
+    }).format(date);
   };
 
-  // 시간 포맷 함수
   const formatTime = (dateString) => {
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.error("Invalid time:", dateString);
+      return ""; // 유효하지 않은 시간인 경우 빈 문자열 반환
+    }
 
-    return date.toLocaleTimeString("ko-KR", {
-      hour: "2-digit",
+    const kstDate = new Date(
+      date.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+    ); // KST로 변환
+
+    return new Intl.DateTimeFormat("ko-KR", {
+      hour: "numeric",
       minute: "2-digit",
-    });
+      hour12: true, // 12시간 형식 사용
+    })
+      .format(kstDate)
+      .replace("오후", "오후 ")
+      .replace("오전", "오전 "); // "오후"와 "오전" 사이에 공백 추가
   };
 
   return (
