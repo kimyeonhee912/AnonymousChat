@@ -49,6 +49,17 @@
     &::after {
       right: 0;
     }
+
+    @media (max-width: 768px) {
+      // 모바일 화면
+      font-size: 0.9em;
+      margin: 5px 0;
+
+      &::before,
+      &::after {
+        width: 35%;
+      }
+    }
   }
 }
 
