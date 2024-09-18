@@ -1,12 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./main.scss";
 import supabase from "./supabaseClient.js";
+import moon from "../../assets/dark-moon.svg";
+import sun from "../../assets/dark-sun.svg";
 
 export const Main = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const messageListRef = useRef(null);
   const textareaRef = useRef(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prevMode) => !prevMode);
+  };
 
   const sortMessagesByTime = (msgs) => {
     return [...msgs].sort((a, b) => new Date(a.time) - new Date(b.time));
@@ -33,7 +40,16 @@ export const Main = () => {
     };
 
     fetchMessage();
+
+    const savedMode = localStorage.getItem("darkMode");
+    if (savedMode === "true") {
+      setIsDarkMode(true);
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("darkMode", isDarkMode);
+  }, [isDarkMode]);
 
   const handleSendMessage = async () => {
     if (message.trim() !== "") {
@@ -118,7 +134,14 @@ export const Main = () => {
   };
 
   return (
-    <div className="main-container">
+    <div className={`main-container ${isDarkMode ? "dark-mode" : ""}`}>
+      {/* Dark mode switch */}
+      <div className="dark-mode-toggle" onClick={toggleDarkMode}>
+        <div className={`toggle-switch ${isDarkMode ? "dark" : ""}`}>
+          <img src={moon} alt="dark mode" className="icon moon" />
+          <img src={sun} alt="light mode" className="icon sun" />
+        </div>
+      </div>
       <div className="message-list" ref={messageListRef}>
         {messages.map((msg, index) => {
           const currentDate = formatDate(msg.time);
@@ -131,7 +154,7 @@ export const Main = () => {
               {currentDate !== prevDate && (
                 <div className="date-divider">{currentDate}</div>
               )}
-              <div className="message-item">
+              <div className={`message-item ${isDarkMode ? "dark-mode" : ""}`}>
                 <div className="message">
                   <p>
                     {msg.text.split("\n").map((line, index) => (
@@ -149,7 +172,7 @@ export const Main = () => {
         })}
       </div>
 
-      <div className="message-input">
+      <div className={`message-input ${isDarkMode ? "dark-mode" : ""}`}>
         <textarea
           ref={textareaRef}
           placeholder="메시지를 입력하세요"
@@ -158,8 +181,14 @@ export const Main = () => {
           onKeyDown={handleKeyDown}
           rows={calculateRows()}
           style={{ resize: "none", overflow: "hidden" }}
+          className={isDarkMode ? "dark-mode" : ""}
         />
-        <button onClick={handleSendMessage}>전송</button>
+        <button
+          className={isDarkMode ? "dark-mode" : ""}
+          onClick={handleSendMessage}
+        >
+          전송
+        </button>
       </div>
     </div>
   );

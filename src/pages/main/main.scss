@@ -2,9 +2,81 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 0px 20px 20px 20px;
   height: 100vh;
-  background-color: #f1f1f1;
+  background-color: #f1f1f1; // 기본 배경색
+
+  &.dark-mode {
+    background-color: #1e1e1e; // 다크 모드 배경색
+    color: rgb(86, 86, 86); // 다크 모드 글자색
+  }
+}
+
+.dark-mode-toggle {
+  position: fixed;
+  top: 5px;
+  left: 28vw; /* 기본값: 노트북 크기에서 적용 */
+  cursor: pointer;
+  z-index: 999;
+  margin: 20px;
+
+  .toggle-switch {
+    width: 35px;
+    height: 35px;
+    background-color: #ccc;
+    border-radius: 25px;
+    position: relative;
+    transition: background-color 0.3s ease;
+
+    &.dark {
+      background-color: #2e7eff;
+    }
+
+    .icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: all 0.3s ease;
+
+      &.moon {
+        opacity: 1;
+        width: 30px;
+        height: 18px;
+        left: 2px;
+      }
+
+      &.sun {
+        opacity: 0;
+        width: 50px;
+        height: 30px;
+      }
+
+      &.sun + .moon {
+        opacity: 1;
+      }
+    }
+
+    &.dark .moon {
+      opacity: 0;
+    }
+
+    &.dark .sun {
+      opacity: 1;
+    }
+  }
+}
+/* 모바일 */
+@media (max-width: 768px) {
+  .dark-mode-toggle {
+    left: 1vw;
+  }
+}
+
+/* 노트북 */
+@media (max-width: 1440px) {
+  .dark-mode-toggle {
+    left: 1vw;
+  }
 }
 
 .message-list {
@@ -26,7 +98,7 @@
   .date-divider {
     width: 100%; // 전체 너비를 사용
     text-align: center;
-    color: #4f4f4f;
+    color: #848484; // 기본 글자색
     font-size: 0.9em;
     margin: 10px 0;
     position: relative;
@@ -39,7 +111,7 @@
       top: 50%;
       width: 40%;
       height: 1px;
-      background-color: #868686;
+      background-color: #868686; // 기본 구분선 색상
     }
 
     &::before {
@@ -60,11 +132,20 @@
         width: 35%;
       }
     }
+
+    // 다크 모드 스타일
+    &.dark-mode {
+      color: #ffffff; // 다크 모드 글자색
+      &::before,
+      &::after {
+        background-color: #444; // 다크 모드 구분선 색상
+      }
+    }
   }
 }
 
 .message-item {
-  background-color: #ffffff;
+  background-color: #ffffff; // 기본 메시지 배경색
   padding: 10px 15px;
   margin-bottom: 10px;
   border-radius: 15px;
@@ -81,7 +162,7 @@
     position: absolute;
     top: 21px;
     right: -20px;
-    border-left: 30px solid #ffffff;
+    border-left: 30px solid #ffffff; // 기본 화살표 색상
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
   }
@@ -93,9 +174,23 @@
 
   span {
     font-size: 12px;
-    color: #666;
+    color: #666; // 기본 시간 색상
     margin-top: 5px;
     align-self: flex-end;
+  }
+
+  // 다크 모드 스타일
+  &.dark-mode {
+    background-color: #333; // 다크 모드 메시지 배경색
+    color: rgb(242, 242, 242); // 다크 모드 글자색
+
+    &::after {
+      border-left: 30px solid #333; // 다크 모드 화살표 색상
+    }
+
+    span {
+      color: #c0bfbf; // 다크 모드 시간 색상
+    }
   }
 }
 
@@ -109,33 +204,57 @@
     padding: 10px;
     font-size: 16px;
     margin-right: 10px;
-    border: 1px solid #ccc;
     border-radius: 5px;
     flex: 1;
     min-height: 40px;
+    border: 1px solid #ccc; // 기본 테두리 색상
 
     // 포커스 시 보더 색상 변경
     &:focus {
       border-color: #2e7eff; // 원하는 색상으로 변경
       outline: none; // 기본 포커스 아웃라인 제거
     }
+
+    // 다크 모드 스타일
+    &.dark-mode {
+      background-color: #444; // 다크 모드 배경색
+      color: white; // 다크 모드 글자색
+      border: 1px solid #5f5f5f; // 다크 모드 테두리 색상
+
+      &:focus {
+        border-color: #124598; // 원하는 색상으로 변경
+        outline: none; // 기본 포커스 아웃라인 제거
+      }
+    }
   }
 
   button {
-    padding: 10px 15px;
     font-size: 16px;
-    background-color: #ffffff;
-    color: #2e7eff;
-    border: 1px solid #2e7eff;
     border-radius: 5px;
     cursor: pointer;
-    // 고정된 너비 설정
     width: 80px;
-    max-height: 40px;
+    max-height: 50px;
+    border: 1px solid #2e7eff;
+    color: #2e7eff; // 기본 버튼 글자색
+    background-color: #ffffff; // 기본 버튼 배경색
+
+    // 다크 모드 스타일
+    &.dark-mode {
+      background-color: #666; // 다크 모드 버튼 배경색
+      color: rgb(0, 0, 0); // 다크 모드 버튼 글자색
+      border: 1px solid #455063; // 다크 모드 버튼 테두리 색상
+
+      // 다크 모드 호버 스타일
+      &:hover {
+        background-color: #30415f; // 다크 모드 버튼 hover 배경색
+        color: #ffffff; // 다크 모드 버튼 hover 글자색
+      }
+    }
   }
 
+  // 기본 버튼 호버 스타일
   button:hover {
-    background-color: #2e7eff;
-    color: #ffffff;
+    background-color: #2e7eff; // 기본 버튼 hover 색상
+    color: #ffffff; // 기본 버튼 hover 글자색
   }
 }
