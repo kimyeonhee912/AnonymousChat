@@ -21,9 +21,15 @@ export const Main = () => {
 
   useEffect(() => {
     const fetchMessage = async () => {
+      const startTime = performance.now(); // 시작 시간 기록
+
       const { data: message, error } = await supabase
         .from("message")
         .select("*");
+
+      const endTime = performance.now(); // 종료 시간 기록
+
+      console.log(`Fetching messages took ${endTime - startTime} milliseconds`); // 요청 시간 출력
 
       if (error) {
         console.error("Error fetching messages:", error);
