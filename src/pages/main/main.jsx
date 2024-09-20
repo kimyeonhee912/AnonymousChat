@@ -3,33 +3,12 @@ import "./main.scss";
 import supabase from "./supabaseClient.js";
 import moon from "../../assets/dark-moon.svg";
 import sun from "../../assets/dark-sun.svg";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const MESSAGES_PER_PAGE = 20;
-
-const fetchMessages = async ({ pageParam = 0 }) => {
-  const { data: messages, error } = await supabase
-    .from("message")
-    .select("*")
-    .order("time", { ascending: false })
-    .range(
-      pageParam * MESSAGES_PER_PAGE,
-      (pageParam + 1) * MESSAGES_PER_PAGE - 1
-    );
-
-  if (error) {
-    console.error("Error fetching messages:", error);
-    return { messages: [], nextCursor: null }; // 에러 발생 시 빈 배열 반환
-  }
-
-  const nextCursor =
-    messages.length === MESSAGES_PER_PAGE ? pageParam + 1 : null;
-  return { messages: messages || [], nextCursor };
+const fetchMessages = async () => {
+  const { data: messages, error } = await supabase.from("message").select("*");
+  if (error) throw new Error("Error fetching messages");
+  return messages;
 };
 
 const insertMessages = async (newMessage) => {
@@ -45,7 +24,6 @@ export const Main = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const queryClient = useQueryClient();
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
-  const [prevScrollHeight, setPrevScrollHeight] = useState(0);
 
   const toggleDarkMode = () => {
     setIsDarkMode((prevMode) => !prevMode);
@@ -55,25 +33,13 @@ export const Main = () => {
     return [...msgs].sort((a, b) => new Date(a.time) - new Date(b.time));
   };
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useInfiniteQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["messages"],
-    queryFn: fetchMessages,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    //refetchInterval: 5000, // 5초마다 새 메시지 확인
+    queryFn: fetchMessages, // 데이터를 반환하는 함수
   });
 
   // 메시지가 로딩 중이거나 에러가 발생한 경우 빈 배열을 반환
-  const messages =
-    isLoading || isError
-      ? []
-      : data?.pages.flatMap((page) => page.messages).reverse() || [];
+  const messages = isLoading || isError ? [] : data;
 
   const sortedMessages = sortMessagesByTime(messages);
 
@@ -108,25 +74,11 @@ export const Main = () => {
     }
   }, [data, shouldAutoScroll]);
 
-  useEffect(() => {
-    if (messageListRef.current && prevScrollHeight) {
-      messageListRef.current.scrollTop =
-        messageListRef.current.scrollHeight - prevScrollHeight;
-    }
-  }, [messages, prevScrollHeight]);
-
   const handleScroll = () => {
     if (messageListRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
-      const isNearTop = scrollTop < 100;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
-
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px의 여유를 둠
       setShouldAutoScroll(isAtBottom);
-
-      if (isNearTop && hasNextPage && !isFetchingNextPage) {
-        setPrevScrollHeight(scrollHeight);
-        fetchNextPage();
-      }
     }
   };
 
@@ -221,40 +173,33 @@ export const Main = () => {
         ref={messageListRef}
         onScroll={handleScroll}
       >
-        {isFetchingNextPage && <div>Loading more messages...</div>}
-        {Array.isArray(sortedMessages) &&
-          sortedMessages.map((msg, index) => {
-            const currentDate = formatDate(msg.time);
-            const prevDate =
-              index > 0 ? formatDate(sortedMessages[index - 1].time) : null;
+        {sortedMessages.map((msg, index) => {
+          const currentDate = formatDate(msg.time);
+          const prevDate =
+            index > 0 ? formatDate(sortedMessages[index - 1].time) : null;
 
-            return (
-              <React.Fragment key={index}>
-                {/* 날짜 구분선 표시 */}
-                {currentDate !== prevDate && (
-                  <div className="date-divider">{currentDate}</div>
-                )}
-                <div
-                  className={`message-item ${isDarkMode ? "dark-mode" : ""}`}
-                >
-                  <div className="message">
-                    <p>
-                      {msg.text.split("\n").map((line, lineIndex) => (
-                        <React.Fragment key={lineIndex}>
-                          {line}
-                          {lineIndex < msg.text.split("\n").length - 1 && (
-                            <br />
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </p>
-                  </div>
-                  <span>{formatTime(msg.time)}</span>
+          return (
+            <React.Fragment key={index}>
+              {/* 날짜 구분선 표시 */}
+              {currentDate !== prevDate && (
+                <div className="date-divider">{currentDate}</div>
+              )}
+              <div className={`message-item ${isDarkMode ? "dark-mode" : ""}`}>
+                <div className="message">
+                  <p>
+                    {msg.text.split("\n").map((line, index) => (
+                      <React.Fragment key={index}>
+                        {line}
+                        {index < msg.text.split("\n").length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
+                  </p>
                 </div>
-              </React.Fragment>
-            );
-          })}
-        {/* Loading indicator */}
+                <span>{formatTime(msg.time)}</span>
+              </div>
+            </React.Fragment>
+          );
+        })}
       </div>
 
       <div className={`message-input ${isDarkMode ? "dark-mode" : ""}`}>
