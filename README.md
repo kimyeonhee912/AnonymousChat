@@ -9,7 +9,9 @@ AnonymousChat은 사용자가 익명으로 메시지를 보내고 받을 수 있
 - supabase 연결 성공: insert, read의 기능을 제공합니다.
 - 날짜 버그 수정 완료했습니다.
 - 다크모드를 지원합니다.
-- 로드 지연(4초 이상)으로 인해 react-quary로 useInfiniteQuery 로 무한 스크롤 구현해볼 예정입니다.
+- react-query로 useMutation, useQuery 사용해서 업데이트 했습니다.
+- [진행 중]유튜브api 연결해서 내가 듣고 있는 음악에 대해 검색 / 공유 할 수 있는 기능을 추가할 예정입니다.
+- [예정]로드 지연(4초 이상)으로 인해 react-quary로 useInfiniteQuery 로 무한 스크롤 구현해볼 
 
 ## 기능
 
