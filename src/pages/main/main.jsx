@@ -3,13 +3,27 @@ import "./main.scss";
 import supabase from "./supabaseClient.js";
 import moon from "../../assets/dark-moon.svg";
 import sun from "../../assets/dark-sun.svg";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+const fetchMessages = async () => {
+  const { data: messages, error } = await supabase.from("message").select("*");
+  if (error) throw new Error("Error fetching messages");
+  return messages;
+};
+
+const insertMessages = async (newMessage) => {
+  const { data, error } = await supabase.from("message").insert([newMessage]);
+  if (error) throw new Error("Error inserting message");
+  return data;
+};
 
 export const Main = () => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
   const messageListRef = useRef(null);
   const textareaRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const queryClient = useQueryClient();
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
   const toggleDarkMode = () => {
     setIsDarkMode((prevMode) => !prevMode);
@@ -19,33 +33,31 @@ export const Main = () => {
     return [...msgs].sort((a, b) => new Date(a.time) - new Date(b.time));
   };
 
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["messages"],
+    queryFn: fetchMessages, // 데이터를 반환하는 함수
+  });
+
+  // 메시지가 로딩 중이거나 에러가 발생한 경우 빈 배열을 반환
+  const messages = isLoading || isError ? [] : data;
+
+  // 메시지 정렬
+  const sortedMessages = sortMessagesByTime(messages);
+
+  const mutation = useMutation({
+    mutationFn: insertMessages,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["messages"]);
+    },
+    onError: (error) => {
+      console.log("insert message failed:", error);
+    },
+  });
+
   useEffect(() => {
-    const fetchMessage = async () => {
-      const startTime = performance.now(); // 시작 시간 기록
-
-      const { data: message, error } = await supabase
-        .from("message")
-        .select("*");
-
-      const endTime = performance.now(); // 종료 시간 기록
-
-      console.log(`Fetching messages took ${endTime - startTime} milliseconds`); // 요청 시간 출력
-
-      if (error) {
-        console.error("Error fetching messages:", error);
-      } else {
-        const sortedMessages = sortMessagesByTime(message);
-        setMessages(sortedMessages);
-
-        // 페이지가 새로고침된 후 스크롤을 마지막 메시지로 설정
-        if (messageListRef.current) {
-          messageListRef.current.scrollTop =
-            messageListRef.current.scrollHeight;
-        }
-      }
-    };
-
-    fetchMessage();
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
 
     const savedMode = localStorage.getItem("darkMode");
     if (savedMode === "true") {
@@ -56,6 +68,20 @@ export const Main = () => {
   useEffect(() => {
     localStorage.setItem("darkMode", isDarkMode);
   }, [isDarkMode]);
+
+  useEffect(() => {
+    if (shouldAutoScroll && messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [data, shouldAutoScroll]);
+
+  const handleScroll = () => {
+    if (messageListRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px의 여유를 둠
+      setShouldAutoScroll(isAtBottom);
+    }
+  };
 
   const handleSendMessage = async () => {
     if (message.trim() !== "") {
@@ -71,17 +97,12 @@ export const Main = () => {
         time: formattedTime,
       };
 
-      await supabase.from("message").insert([newMessage]);
-
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setMessage("");
-
-      setTimeout(() => {
-        if (messageListRef.current) {
-          messageListRef.current.scrollTop =
-            messageListRef.current.scrollHeight;
-        }
-      }, 0);
+      // 메시지 전송
+      mutation.mutate(newMessage, {
+        onSettled: () => {
+          setMessage("");
+        },
+      });
     }
   };
 
@@ -148,11 +169,15 @@ export const Main = () => {
           <img src={sun} alt="light mode" className="icon sun" />
         </div>
       </div>
-      <div className="message-list" ref={messageListRef}>
-        {messages.map((msg, index) => {
+      <div
+        className="message-list"
+        ref={messageListRef}
+        onScroll={handleScroll}
+      >
+        {sortedMessages.map((msg, index) => {
           const currentDate = formatDate(msg.time);
           const prevDate =
-            index > 0 ? formatDate(messages[index - 1].time) : null;
+            index > 0 ? formatDate(sortedMessages[index - 1].time) : null;
 
           return (
             <React.Fragment key={index}>
