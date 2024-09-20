@@ -41,7 +41,6 @@ export const Main = () => {
   // 메시지가 로딩 중이거나 에러가 발생한 경우 빈 배열을 반환
   const messages = isLoading || isError ? [] : data;
 
-  // 메시지 정렬
   const sortedMessages = sortMessagesByTime(messages);
 
   const mutation = useMutation({
