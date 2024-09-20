@@ -75,11 +75,16 @@ export const Main = () => {
       ? []
       : data?.pages.flatMap((page) => page.messages).reverse() || [];
 
+<<<<<<< HEAD
   // 메시지 정렬
   // 메시지 정렬
   const sortedMessages = sortMessagesByTime(
     messages.filter((msg) => msg && msg.time)
   );
+=======
+  const sortedMessages = sortMessagesByTime(messages);
+
+>>>>>>> temp-branch
   const mutation = useMutation({
     mutationFn: insertMessages,
     onSuccess: () => {
