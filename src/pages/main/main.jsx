@@ -45,6 +45,7 @@ export const Main = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const queryClient = useQueryClient();
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const [prevScrollHeight, setPrevScrollHeight] = useState(0);
 
   const toggleDarkMode = () => {
     setIsDarkMode((prevMode) => !prevMode);
@@ -78,8 +79,7 @@ export const Main = () => {
   // 메시지 정렬
   const sortedMessages = sortMessagesByTime(
     messages.filter((msg) => msg && msg.time)
-  ); // 메시지가 유효한지 확인
-
+  );
   const mutation = useMutation({
     mutationFn: insertMessages,
     onSuccess: () => {
@@ -111,23 +111,23 @@ export const Main = () => {
     }
   }, [data, shouldAutoScroll]);
 
+  useEffect(() => {
+    if (messageListRef.current && prevScrollHeight) {
+      messageListRef.current.scrollTop =
+        messageListRef.current.scrollHeight - prevScrollHeight;
+    }
+  }, [messages, prevScrollHeight]);
+
   const handleScroll = () => {
     if (messageListRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
-      const isNearTop = scrollTop < 100; // 스크롤이 상단에 가까워졌는지 확인
+      const isNearTop = scrollTop < 100;
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
 
-      // 이전에 설정한 auto scroll이 활성화된 경우에만 scrollTop을 업데이트
-      if (shouldAutoScroll) {
-        if (isAtBottom) {
-          setShouldAutoScroll(true);
-        } else {
-          setShouldAutoScroll(false);
-        }
-      }
+      setShouldAutoScroll(isAtBottom);
 
-      // 다음 페이지를 가져올 조건
       if (isNearTop && hasNextPage && !isFetchingNextPage) {
+        setPrevScrollHeight(scrollHeight);
         fetchNextPage();
       }
     }
